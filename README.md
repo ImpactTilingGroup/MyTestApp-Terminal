@@ -10,9 +10,9 @@ Please note that it is not recommended to modify or make changes to a forked ver
 
 ## Contributing
 
-We encourage you to contribute to MyTestApp Terminal and help make it even better! You have write access to the repository, allowing you to directly modify the code without any additional steps.
+We encourage you to contribute to MyTestApp Terminal and help make it even better! To contribute, fork this repository, add your changes, and then submit the changes as a pull request.
 
-Feel free to make changes to the repository to add new features, fix bugs, or improve existing functionality. Your contributions will be reviewed and considered for deployment on https://terminal.mytestapp.me/terminal.
+Feel free to make changes to the repository to add new features, fix bugs, or improve existing functionality. Your pull requests will be reviewed and may be accepted or rejected.
 
 If you encounter any issues, have questions, or want to suggest new ideas, please open an issue on the project's repository (https://github.com/MyTestAppOpen/MyTestApp-Terminal). We value your feedback and will work together to address concerns and improve the project.
 
