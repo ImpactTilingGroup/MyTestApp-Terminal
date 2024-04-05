@@ -6,7 +6,7 @@ Welcome to MyTestApp Terminal, an open-source project that is an easy-to-use web
 
 To use MyTestApp Terminal, simply visit https://terminal.mytestapp.me/terminal in your web browser. The terminal will be available on that webpage for you to use.
 
-Please note that it is not recommended to modify or make changes to a forked version of MyTestApp Terminal, as it may cause your changes to never be deployed on the webpage (https://terminal.mytestapp.me/terminal). The deployment process for changes made to the original repository takes some time, typically ranging from a few hours to a few days. Therefore, it's advisable to contribute to the main repository directly to ensure that your changes are incorporated and deployed on the webpage.
+Please note that it is not recommended to modify or make changes to a forked version of MyTestApp Terminal, as it may cause your changes to never be deployed on https://terminal.mytestapp.me/terminal. The deployment process for changes made to the original repository takes some time, typically ranging from a few hours to a few days. Therefore, it's advisable to contribute to the main repository directly to ensure that your changes are incorporated and deployed on the webpage.
 
 ## Contributing
 
