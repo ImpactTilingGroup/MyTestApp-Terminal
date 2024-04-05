@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+    <head>
+<!-- Copyright (c) 2024 MyTestApp. All rights reserved. All external libraries used in MyTestApp Terminal (c) their respective owners. -->
+<!-- This web app is licensed under GNU GPL v3. You may copy, distribute, modify, and use the source code of this application, but removing author credit is strictly prohibited. -->
+<!--   This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. -->
+<!-- This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. -->
+<!--  You should have received a copy of the GNU General Public License along with this program. If not, see https://www.gnu.org/licenses. For inquiries, contact us at support@mytestapp.me. -->
+<!-- CSS styles -->
+        <style>
+            #terminal {
+                width: 600px;
+                height: 400px;
+                background-color: black;
+                color: white;
+                font-family: monospace;
+                font-size: 16px;
+                padding: 10px;
+                overflow-y: scroll;
+            }
+            
+            #code-editor {
+                position: relative;
+                width: 400px;
+                max-height: calc(100vh - 40px);
+                color: white;
+                background-color: #f5f5f5;
+                font-family: monospace;
+                font-size: 16px;
+                padding: 10px;
+                display: none;
+                border-radius: 10px;
+                margin-top: 10px;
+            }
+            
+            .close-button {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                width: 10px;
+                height: 10px;
+                background-color: red;
+                border-radius: 50%;
+                cursor: pointer;
+                z-index: 1;
+            }
+            
+            .CodeMirror {
+                height: 100%;
+            }
+            
+            #input-row {
+                display: flex;
+                align-items: center;
+            }
+            
+            #input-row span {
+                margin-right: 5px;
+            }
+            
+            #input {
+                flex-grow: 1;
+                background-color: transparent;
+                color: white;
+                border: none;
+                outline: none;
+                font-family: monospace;
+                font-size: 16px;
+                width: 600px;
+            }
+        </style>
+        <!-- CodeMirror stylesheets and script locations -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.min.css">
+            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/javascript/javascript.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/css/css.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/swift/swift.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/python/python.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/shell/shell.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/clike/clike.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/xml/xml.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.min.js"></script>
+            <!-- jQuery script location -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+<body>
+<!-- Terminal and code editor HTML code -->
+    <div id="terminal">
+        <div id="output">MyTestApp Terminal v1.0. Copyright (c) 2024 MyTestApp. All rights reserved.</div>
+        <div id="input-row">
+            <span>$</span>
+            <input id="input" type="text" autofocus>
+        </div>
+    </div>
+    <div id="code-editor">
+      <div class="close-button" onclick="closeCodeEditor()"></div>
+        <div id="code-input"></div>
+        <button id="save-button" onclick="saveFile()">Save</button>
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const output = document.getElementById('output');
+        const input = document.getElementById('input');
+        const codeEditor = document.getElementById('code-editor');
+        const codeInput = document.getElementById('code-input');
+        let codeMirrorInstance = null;
+        let currentFilename = null;
+
+        input.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const command = input.value;
+                input.value = '';
+
+                const commandElement = document.createElement('div');
+                commandElement.textContent = '$ ' + command;
+                output.appendChild(commandElement);
+
+                processCommand(command);
+            }
+        });
+// Code to make the Code Editor draggable
+       $(document).ready(function() {
+  var isDragging = false;
+  var editor = $("#code-editor");
+  var initialX, initialY;
+  var offsetX = 0, offsetY = 0;
+
+  editor.mousedown(function(event) {
+    isDragging = true;
+    editor.css("cursor", "grabbing");
+    initialX = event.clientX - offsetX;
+    initialY = event.clientY - offsetY;
+  });
+
+  $(document).mousemove(function(event) {
+    if (isDragging) {
+      offsetX = event.clientX - initialX;
+      offsetY = event.clientY - initialY;
+      editor.css("transform", "translate(" + offsetX + "px, " + offsetY + "px)");
+    }
+  });
+
+  $(document).mouseup(function() {
+    isDragging = false;
+    editor.css("cursor", "grab");
+  });
+});
+// MyTestApp Terminal Shell
+        function processCommand(command) {
+            const args = command.split(' ');
+            const cmd = args[0];
+
+            switch (cmd) {
+                case 'help':
+                    outputCommandOutput('For available commands and other help info, see this URL.');
+                    break;
+                case 'date':
+                    const currentDate = new Date().toDateString();
+                    outputCommandOutput(currentDate);
+                    break;
+                case 'echo':
+                    const outputText = args.slice(1).join(' ');
+                    outputCommandOutput(outputText);
+                    break;
+                case 'run':
+                    const code = args.slice(1).join(' ');
+                    runCode(code);
+                    break;
+                case 'touch':
+                    const filename = args[1];
+                    const contentIndex = args.findIndex(arg => arg.startsWith('content='));
+                    if (contentIndex !== -1) {
+                        const contentArg = args[contentIndex];
+                        const content = contentArg.substring(contentArg.indexOf('=') + 1);
+                        createFile(filename, content);
+                    } else {
+                        createFile(filename);
+                    }
+                    break;
+                case 'open':
+                    openFile();
+                    break;
+                default:
+                    outputCommandOutput("Command not found.");
+            }
+        }
+
+       function outputCommandOutput(outputText) {
+        const outputElement = document.createElement('div');
+        if (outputText === 'For available commands and other help info, see this URL.') {
+            const helpLink = document.createElement('a');
+            helpLink.href = "https://terminal.mytestapp.me/help";
+            helpLink.textContent = "this URL.";
+            helpLink.target = "_blank";
+            outputElement.appendChild(document.createTextNode("For available commands and other help info, see "));
+            outputElement.appendChild(helpLink);
+        } else {
+            outputElement.textContent = outputText;
+        }
+        output.appendChild(outputElement);
+        terminal.scrollTop = terminal.scrollHeight;
+    }
+
+        function runCode(code) {
+            const outputWindow = window.open('', '_blank');
+            outputWindow.document.write(code);
+            outputWindow.document.close();
+        }
+
+       function createFile(filename, content = '') {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.download = filename;
+            downloadLink.textContent = 'Download ' + filename;
+            outputCommandOutput('Created file: ' + filename);
+            output.appendChild(downloadLink);
+        }
+
+    function openFile() {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.html,.css,.js,.xml,.swift,.py,.sh,.bash,.zsh,.m,.mm,.c,.h,.cpp,.hpp,.inl,.json';
+
+            fileInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+                    const content = event.target.result;
+                    codeEditor.style.display = 'block';
+                    currentFilename = file.name; // Store the current filename
+
+                    if (codeMirrorInstance) {
+                        codeMirrorInstance.setValue(content); // Update editor content
+                        codeMirrorInstance.setOption('mode', getFileMode(file.name)); // Update editor mode
+                    } else {
+                        codeMirrorInstance = CodeMirror(codeInput, {
+                            lineNumbers: true,
+                            mode: getFileMode(file.name),
+                            value: content,
+                        });
+                    }
+                };
+
+                reader.readAsText(file);
+            });
+
+            fileInput.click();
+        }
+
+  function getFileMode(fileName) {
+    const fileExtension = fileName.split('.').pop();
+    switch (fileExtension) {
+      case 'js':
+        return 'javascript';
+      case 'html':
+        return 'htmlmixed';
+      case 'css':
+        return 'css';
+      case 'swift':
+        return 'swift';
+      case 'py':
+        return 'python';
+      case 'sh':
+      case 'bash':
+      case 'zsh':
+        return 'shell';
+      case 'm':
+      case 'mm':
+        return 'clike';
+      case 'c':
+      case 'h':
+      case 'cpp':
+      case 'hpp':
+        return 'clike';
+      case 'json':
+        return 'application/json';
+      default:
+        return 'text/plain';
+    }
+  }
+
+        function closeCodeEditor() {
+            codeEditor.style.display = 'none';
+            codeMirrorInstance.setValue('');
+        }
+
+   function saveFile() {
+            if (codeMirrorInstance && currentFilename) {
+                const content = codeMirrorInstance.getValue();
+                const blob = new Blob([content], { type: 'text/plain' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = currentFilename; // Use the current filename
+                link.click();
+            }
+        }
+    </script>
+</body>
+</html>
