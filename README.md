@@ -1,6 +1,6 @@
 # Welcome
 
-Welcome to MyTestApp Terminal, an open-source project that is an easy-to-use web-based terminal, JavaScript Console, and code editor.
+Welcome to MyTestApp Terminal, an open-source project that is an easy-to-use web-based terminal, JavaScript console, and code editor.
 
 ## Getting Started
 
