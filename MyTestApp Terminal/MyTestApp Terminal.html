@@ -86,7 +86,7 @@
 <body>
 <!-- Terminal and code editor HTML code -->
     <div id="terminal">
-        <div id="output">MyTestApp Terminal v1.0. Copyright (c) 2024 MyTestApp. All rights reserved.</div>
+        <div id="output">MyTestApp Terminal v1.1. Copyright (c) 2024 MyTestApp. All rights reserved. All external libraries used (c) their respective owners.</div>
         <div id="input-row">
             <span>$</span>
             <input id="input" type="text" autofocus>
@@ -164,10 +164,15 @@
                     const outputText = args.slice(1).join(' ');
                     outputCommandOutput(outputText);
                     break;
-                case 'run':
-                    const code = args.slice(1).join(' ');
-                    runCode(code);
-                    break;
+               case 'run':
+            const code = args.slice(1).join(' ');
+            const jsCodeOptionIndex = args.findIndex(arg => arg === 'jsCode=YES');
+            if (jsCodeOptionIndex !== -1) {
+                runJavaScriptCode(code);
+            } else {
+                runCode(code);
+            }
+            break;
                 case 'touch':
                     const filename = args[1];
                     const contentIndex = args.findIndex(arg => arg.startsWith('content='));
@@ -182,6 +187,16 @@
                 case 'open':
                     openFile();
                     break;
+                case 'dump':
+                    const rootNodeSelector = args[1];
+                    const rootNode = getRootNode(rootNodeSelector);
+                    if (rootNode) {
+                    const htmlTree = generateHTMLTree(rootNode);
+                    outputCommandOutput(htmlTree);
+                    } else {
+                    outputCommandOutput('Invalid node: ' + rootNodeSelector);
+                 }
+            break;
                 default:
                     outputCommandOutput("Command not found.");
             }
@@ -208,6 +223,58 @@
             outputWindow.document.write(code);
             outputWindow.document.close();
         }
+
+       function runJavaScriptCode(code) {
+           const jsCodeOptionIndex = code.indexOf('jsCode=YES');
+           if (jsCodeOptionIndex !== -1) {
+           code = code.substring(0, jsCodeOptionIndex) + code.substring(jsCodeOptionIndex + 11);
+    }
+
+    try {
+        const result = eval(code);
+        if (result !== undefined) {
+            outputCommandOutput(result.toString());
+        }
+    } catch (error) {
+        outputCommandOutput('Error: ' + error.message);
+    }
+}
+
+function getRootNode(selector) {
+    if (!selector) {
+        return document.body;
+    }
+
+    if (selector.startsWith('#')) {
+        const id = selector.slice(1);
+        return document.getElementById(id);
+    }
+
+    return document.querySelector(selector);
+}
+
+    function generateHTMLTree(node) {
+        let tree = '';
+
+    function traverse(element, depth) {
+        const indent = '  '.repeat(depth);
+        const tagName = element.tagName.toLowerCase();
+        const attributes = Array.from(element.attributes)
+            .map(attr => `${attr.name}="${attr.value}"`)
+            .join(' ');
+
+        tree += `${indent}<${tagName} ${attributes}>\n`;
+
+        Array.from(element.children).forEach(child => {
+            traverse(child, depth + 1);
+        });
+
+        tree += `${indent}</${tagName}>\n`;
+    }
+
+    traverse(node, 0);
+    return tree;
+}
 
        function createFile(filename, content = '') {
             const blob = new Blob([content], { type: 'text/plain' });
