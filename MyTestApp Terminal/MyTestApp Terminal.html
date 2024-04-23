@@ -86,7 +86,7 @@
 <body>
 <!-- Terminal and code editor HTML code -->
     <div id="terminal">
-        <div id="output">MyTestApp Terminal v1.1. Copyright (c) 2024 MyTestApp. All rights reserved. All external libraries used (c) their respective owners.</div>
+        <div id="output">MyTestApp Terminal v1.1.1. Copyright (c) 2024 MyTestApp. All rights reserved. All external libraries used (c) their respective owners.</div>
         <div id="input-row">
             <span>$</span>
             <input id="input" type="text" autofocus>
@@ -166,7 +166,7 @@
                     break;
                case 'run':
             const code = args.slice(1).join(' ');
-            const jsCodeOptionIndex = args.findIndex(arg => arg === 'jsCode=YES');
+            const jsCodeOptionIndex = args.findIndex(arg => arg === '?jsCode=YES');
             if (jsCodeOptionIndex !== -1) {
                 runJavaScriptCode(code);
             } else {
@@ -175,7 +175,7 @@
             break;
                 case 'touch':
                     const filename = args[1];
-                    const contentIndex = args.findIndex(arg => arg.startsWith('content='));
+                    const contentIndex = args.findIndex(arg => arg.startsWith('?content='));
                     if (contentIndex !== -1) {
                         const contentArg = args[contentIndex];
                         const content = contentArg.substring(contentArg.indexOf('=') + 1);
@@ -225,7 +225,7 @@
         }
 
        function runJavaScriptCode(code) {
-           const jsCodeOptionIndex = code.indexOf('jsCode=YES');
+           const jsCodeOptionIndex = code.indexOf('?jsCode=YES');
            if (jsCodeOptionIndex !== -1) {
            code = code.substring(0, jsCodeOptionIndex) + code.substring(jsCodeOptionIndex + 11);
     }
