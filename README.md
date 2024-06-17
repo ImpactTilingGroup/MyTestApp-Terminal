@@ -1,6 +1,6 @@
 # Welcome
 
-Welcome to TerminalBox, an open-source project that is an easy-to-use web-based terminal, JavaScript console, and code editor.
+Welcome to TerminalBox, an open-source project that is an easy-to-use web-based terminal and code editor.
 
 ## Getting Started
 
