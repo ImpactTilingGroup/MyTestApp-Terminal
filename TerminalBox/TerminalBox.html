@@ -1,111 +1,152 @@
 <!DOCTYPE html>
 <html>
-    <head>
-<!-- Copyright (c) 2024 Impact Tiling Group Pty Ltd. All rights reserved. All external libraries used in TerminalBox (c) their respective owners. -->
-<!--   This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. -->
-<!-- This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. -->
-<!--  You should have received a copy of the GNU General Public License along with this program. If not, see https://www.gnu.org/licenses. For inquiries, contact us at support@mytestapp.me. -->
-<!-- CSS styles -->
-        <style>
-            #terminal {
-                width: 600px;
-                height: 400px;
-                background-color: black;
-                color: white;
-                font-family: monospace;
-                font-size: 16px;
-                padding: 10px;
-                overflow-y: scroll;
-            }
-            
-            #code-editor {
-                position: relative;
-                width: 400px;
-                max-height: calc(100vh - 40px);
-                color: white;
-                background-color: #f5f5f5;
-                font-family: monospace;
-                font-size: 16px;
-                padding: 10px;
-                display: none;
-                border-radius: 10px;
-                margin-top: 10px;
-            }
-            
-            .close-button {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                width: 10px;
-                height: 10px;
-                background-color: red;
-                border-radius: 50%;
-                cursor: pointer;
-                z-index: 1;
-            }
-            
-            .CodeMirror {
-                height: 100%;
-            }
-            
-            #input-row {
-                display: flex;
-                align-items: center;
-            }
-            
-            #input-row span {
-                margin-right: 5px;
-            }
-            
-            #input {
-                flex-grow: 1;
-                background-color: transparent;
-                color: white;
-                border: none;
-                outline: none;
-                font-family: monospace;
-                font-size: 16px;
-                width: 600px;
-            }
-        </style>
-        <!-- CodeMirror stylesheets and script locations -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.min.css">
-            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/javascript/javascript.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/css/css.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/swift/swift.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/python/python.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/shell/shell.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/clike/clike.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/mode/xml/xml.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/lib/codemirror.min.js"></script>
-            <!-- jQuery script location -->
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    </head>
+<head>
+    <!-- Copyright (c) 2024 Impact Tiling Group Pty Ltd. All rights reserved. All external libraries used in TerminalBox (c) their respective owners. -->
+    <!--   This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. -->
+    <!-- This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. -->
+    <!--  You should have received a copy of the GNU General Public License along with this program. If not, see https://www.gnu.org/licenses. For inquiries, contact us at support@mytestapp.me. -->
+    <!-- CSS styles -->
+    <style>
+        
+        /* Terminal CSS */
+        #terminal {
+            width: 600px;
+            height: 400px;
+            background-color: black;
+            color: white;
+            font-family: monospace;
+            font-size: 16px;
+            padding: 10px;
+            overflow-y: scroll;
+            border-radius: 10px;
+        }
+        
+        /* Code editor window CSS */
+        #code-editor-window {
+            position: relative;
+            width: 400px;
+            height: 420px;
+            color: white;
+            background-color: #f5f5f5;
+            font-family: monospace;
+            font-size: 16px;
+            padding: 10px;
+            display: none;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        
+        /* Ace Editor container CSS */
+        #ace-editor {
+            width: 95%;
+            height: 88%;
+            position: absolute;
+        }
+
+        .spacer {
+            width: 600px;
+            height: 385px;
+        }
+        
+        /* Code editor window button CSS (except the close button) */
+        #save-button, #execute-button, #save-execute-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        /* Hover effect */
+        #save-button:hover {
+            background-color: #45a049;
+        }
+        
+        /* Active/focus effect */
+        #save-button:active, #save-button:focus {
+            outline: none;
+            background-color: #3e8e41;
+        }
+        
+        /* Code editor window close button CSS */
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1;
+        }
+        
+        /* Set script error messages to red */
+        .error-message {
+            color: red;
+        }
+        
+        /* Terminal input CSS */
+        #input-row {
+            display: flex;
+            align-items: center;
+        }
+        
+        #input-row span {
+            margin-right: 5px;
+        }
+        
+        #input {
+            flex-grow: 1;
+            background-color: transparent;
+            color: white;
+            border: none;
+            outline: none;
+            font-family: monospace;
+            font-size: 16px;
+            width: 600px;
+        }
+    </style>
+    <!-- Ace Editor script location -->
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.4.12/src/ace.js"></script>
+    <!-- jQuery script location -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Skulpt and Skulpt-Stdlib script locations -->
+    <script src="https://skulpt.org/js/skulpt.min.js" type="text/javascript"></script>
+    <script src="https://skulpt.org/js/skulpt-stdlib.js" type="text/javascript"></script>
+</head>
 <body>
-<!-- Terminal and code editor HTML code -->
+    <!-- Terminal and code editor window HTML code -->
     <div id="terminal">
-        <div id="output">TerminalBox v1.1.3. Copyright (c) 2024 Impact Tiling Group Pty Ltd. All rights reserved. All external libraries used (c) their respective owners.</div>
+        <div id="output">TerminalBox v2.0. Copyright (c) 2024 Impact Tiling Group Pty Ltd. All rights reserved. All external libraries used (c) their respective owners.</div>
         <div id="input-row">
             <span>$</span>
             <input id="input" type="text" autofocus>
         </div>
     </div>
-    <div id="code-editor">
-      <div class="close-button" onclick="closeCodeEditor()"></div>
-        <div id="code-input"></div>
+    <div id="code-editor-window">
+        <div class="close-button" onclick="closeCodeEditorWindow()"></div>
+        <div id="ace-editor"></div>
+        <div class="spacer"></div>
         <button id="save-button" onclick="saveFile()">Save</button>
+        <button id="execute-button" onclick="executeCode()" style="display: none;">Execute</button>
+        <button id="save-execute-button" onclick="saveAndExecuteCode()" style="display: none;">Save and Execute</button>
     </div>
-
     <script>
+        // TerminalBox Shell (tbsh) logic
         const terminal = document.getElementById('terminal');
         const output = document.getElementById('output');
         const input = document.getElementById('input');
-        const codeEditor = document.getElementById('code-editor');
-        const codeInput = document.getElementById('code-input');
-        let codeMirrorInstance = null;
+        const codeEditorWindow = document.getElementById('code-editor-window');
+        const executeButton = document.getElementById('execute-button');
+        const saveExecuteButton = document.getElementById('save-execute-button');
+        let editor = null;
         let currentFilename = null;
-
+        let inputCallback = null;
+        let isRunningPythonScript = false;
+        
         input.addEventListener('keydown', function (event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -116,44 +157,50 @@
                 commandElement.textContent = '$ ' + command;
                 output.appendChild(commandElement);
 
-                processCommand(command);
+                if (!isRunningPythonScript) {
+                    processCommand(command);
+                }
+
+                handleUserInput(command);
             }
         });
-// Code to make the Code Editor draggable
-       $(document).ready(function() {
-  var isDragging = false;
-  var editor = $("#code-editor");
-  var initialX, initialY;
-  var offsetX = 0, offsetY = 0;
 
-  editor.mousedown(function(event) {
-    isDragging = true;
-    editor.css("cursor", "grabbing");
-    initialX = event.clientX - offsetX;
-    initialY = event.clientY - offsetY;
-  });
+        // Make the Code Editor Window draggable
+        $(document).ready(function() {
+            var isDragging = false;
+            var editor_window = $("#code-editor-window");
+            var initialX, initialY;
+            var offsetX = 0, offsetY = 0;
 
-  $(document).mousemove(function(event) {
-    if (isDragging) {
-      offsetX = event.clientX - initialX;
-      offsetY = event.clientY - initialY;
-      editor.css("transform", "translate(" + offsetX + "px, " + offsetY + "px)");
-    }
-  });
+            editor_window.mousedown(function(event) {
+                isDragging = true;
+                editor_window.css("cursor", "grabbing");
+                initialX = event.clientX - offsetX;
+                initialY = event.clientY - offsetY;
+            });
 
-  $(document).mouseup(function() {
-    isDragging = false;
-    editor.css("cursor", "grab");
-  });
-});
-// TerminalBox Shell (tbsh) logic
+            $(document).mousemove(function(event) {
+                if (isDragging) {
+                    offsetX = event.clientX - initialX;
+                    offsetY = event.clientY - initialY;
+                    editor_window.css("transform", "translate(" + offsetX + "px, " + offsetY + "px)");
+                }
+            });
+
+            $(document).mouseup(function() {
+                isDragging = false;
+                editor_window.css("cursor", "grab");
+            });
+        });
+        
+        // Process commands entered into TerminalBox
         function processCommand(command) {
             const args = command.split(' ');
             const cmd = args[0];
 
             switch (cmd) {
                 case 'help':
-                    outputCommandOutput('For available commands and other help info, see this URL.');
+                   outputCommandOutput('For available commands and other help info, see <a href="https://terminal.mytestapp.me/documentation" target="_blank">this URL.</a>');
                     break;
                 case 'date':
                     const currentDate = new Date().toDateString();
@@ -163,15 +210,6 @@
                     const outputText = args.slice(1).join(' ');
                     outputCommandOutput(outputText);
                     break;
-               case 'run':
-            const code = args.slice(1).join(' ');
-            const jsCodeOptionIndex = args.findIndex(arg => arg === '?jsCode=YES');
-            if (jsCodeOptionIndex !== -1) {
-                runJavaScriptCode(code);
-            } else {
-                runCode(code);
-            }
-            break;
                 case 'touch':
                     const filename = args[1];
                     const contentIndex = args.findIndex(arg => arg.startsWith('?content='));
@@ -190,104 +228,130 @@
                     const rootNodeSelector = args[1];
                     const rootNode = getRootNode(rootNodeSelector);
                     if (rootNode) {
-                    const htmlTree = generateHTMLTree(rootNode);
-                    outputCommandOutput(htmlTree);
+                        const htmlTree = generateHTMLTree(rootNode);
+                        outputCommandOutput(htmlTree);
                     } else {
-                    outputCommandOutput('Invalid node: ' + rootNodeSelector);
-                 }
-            break;
+                        outputCommandOutput('Invalid node: ' + rootNodeSelector);
+                    }
+                    break;
+                case 'clear':
+                    output.innerHTML = 'TerminalBox v2.0. Copyright (c) 2024 Impact Tiling Group Pty Ltd. All rights reserved. All external libraries used (c) their respective owners.';
+                    break;
                 default:
                     outputCommandOutput("Command not found.");
             }
         }
 
-       function outputCommandOutput(outputText) {
-        const outputElement = document.createElement('div');
-        if (outputText === 'For available commands and other help info, see this URL.') {
-            const helpLink = document.createElement('a');
-            helpLink.href = "https://terminal.mytestapp.me/documentation";
-            helpLink.textContent = "this URL.";
-            helpLink.target = "_blank";
-            outputElement.appendChild(document.createTextNode("For available commands and other help info, see "));
-            outputElement.appendChild(helpLink);
-        } else {
-            outputElement.textContent = outputText;
-        }
-        output.appendChild(outputElement);
-        terminal.scrollTop = terminal.scrollHeight;
-    }
-
-        function runCode(code) {
+        function outputCommandOutput(outputText, isError = false) {
+                    const outputElement = document.createElement('div');
+                    outputElement.innerHTML = outputText;
+                    if (isError) {
+                        outputElement.classList.add('error-message');
+                    }
+                    output.appendChild(outputElement);
+                    terminal.scrollTop = terminal.scrollHeight;
+                }
+        
+        // Run provided HTML code
+        function runHTMLCode(code) {
             const outputWindow = window.open('', '_blank');
             outputWindow.document.write(code);
             outputWindow.document.close();
         }
-
-       function runJavaScriptCode(code) {
-           const jsCodeOptionIndex = code.indexOf('?jsCode=YES');
-           if (jsCodeOptionIndex !== -1) {
-           code = code.substring(0, jsCodeOptionIndex) + code.substring(jsCodeOptionIndex + 11);
-    }
-
-    try {
-        const result = eval(code);
-        if (result !== undefined) {
-            outputCommandOutput(result.toString());
+        // Run provided JavaScript code
+        function runJavaScriptCode(code) {
+            try {
+                const result = eval(code);
+                if (result !== undefined) {
+                    outputCommandOutput(result.toString());
+                }
+            } catch (error) {
+                outputCommandOutput('Error: ' + error.message, true);
+            }
         }
-    } catch (error) {
-        outputCommandOutput('Error: ' + error.message);
-    }
-}
 
-function getRootNode(selector) {
-    if (!selector) {
-        return document.body;
-    }
+        // Handle user input during Python program execution
+        function handleUserInput(inputValue) {
+            if (inputCallback) {
+                inputCallback(inputValue);
+                inputCallback = null; // Reset callback after handling input
+            }
+        }
+        // Run provided Python scripts
+        function runPythonCode(code) {
+            isRunningPythonScript = true;
 
-    if (selector.startsWith('#')) {
-        const id = selector.slice(1);
-        return document.getElementById(id);
-    }
+            Sk.configure({
+                output: (text) => outputCommandOutput(text),
+                read: (x) => {
+                    if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+                        throw "File not found: '" + x + "'";
+                    return Sk.builtinFiles["files"][x];
+                },
+                inputfun: function(prompt) {
+                    return new Promise(function(resolve) {
+                        inputCallback = resolve; // Set callback to resolve user input
+                    });
+                }
+            });
 
-    return document.querySelector(selector);
-}
+            Sk.misceval.asyncToPromise(() => {
+                return Sk.importMainWithBody("<stdin>", false, code, true);
+            }).then(() => {
+                isRunningPythonScript = false;  // Reset the flag
+            }, (error) => {
+                outputCommandOutput('Error: ' + error.toString(), true);
+                isRunningPythonScript = false;  // Reset the flag
+            });
+        }
 
-    function generateHTMLTree(node) {
-        let tree = '';
+        function getRootNode(selector) {
+            if (!selector) {
+                return document.body;
+            }
 
-    function traverse(element, depth) {
-        const indent = '  '.repeat(depth);
-        const tagName = element.tagName.toLowerCase();
-        const attributes = Array.from(element.attributes)
-            .map(attr => `${attr.name}="${attr.value}"`)
-            .join(' ');
+            if (selector.startsWith('#')) {
+                const id = selector.slice(1);
+                return document.getElementById(id);
+            }
 
-        tree += `${indent}<${tagName} ${attributes}>\n`;
+            return document.querySelector(selector);
+        }
+        
+        function generateHTMLTree(node) {
+            let tree = '';
 
-        Array.from(element.children).forEach(child => {
-            traverse(child, depth + 1);
-        });
+            function traverse(element, depth) {
+                const indent = '  '.repeat(depth);
+                const tagName = element.tagName.toLowerCase();
+                const attributes = Array.from(element.attributes)
+                    .map(attr => `${attr.name}="${attr.value}"`)
+                    .join(' ');
 
-        tree += `${indent}</${tagName}>\n`;
-    }
+                tree += `${indent}<${tagName} ${attributes}>\n`;
 
-    traverse(node, 0);
-    return tree;
-}
+                Array.from(element.children).forEach(child => {
+                    traverse(child, depth + 1);
+                });
 
-       function createFile(filename, content = '') {
+                tree += `${indent}</${tagName}>\n`;
+            }
+
+            traverse(node, 0);
+            return tree;
+        }
+
+        // Create a file
+        function createFile(filename, content = '') {
             const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-
-            const downloadLink = document.createElement('a');
-            downloadLink.href = url;
-            downloadLink.download = filename;
-            downloadLink.textContent = 'Download ' + filename;
-            outputCommandOutput('Created file: ' + filename);
-            output.appendChild(downloadLink);
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
         }
 
-    function openFile() {
+        // Open a file
+        function openFile() {
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
             fileInput.accept = '.html,.css,.js,.xml,.swift,.py,.sh,.bash,.zsh,.m,.mm,.c,.h,.cpp,.hpp,.inl,.def,.cc,.cxx,.s,.asm,.nasm,.wasm,.json,.yml,.yaml';
@@ -298,18 +362,26 @@ function getRootNode(selector) {
 
                 reader.onload = function (event) {
                     const content = event.target.result;
-                    codeEditor.style.display = 'block';
-                    currentFilename = file.name; // Store the current filename
+                    codeEditorWindow.style.display = 'block';
+                    currentFilename = file.name;
 
-                    if (codeMirrorInstance) {
-                        codeMirrorInstance.setValue(content); // Update editor content
-                        codeMirrorInstance.setOption('mode', getFileMode(file.name)); // Update editor mode
+                    if (editor === null) {
+                        editor = ace.edit("ace-editor");
+                        editor.setTheme("ace/theme/chrome");
+                    }
+
+                    const mode = getFileMode(file.name);
+                    editor.getSession().setMode("ace/mode/" + mode);
+                    editor.setValue(content);
+                    editor.clearSelection();
+
+                    // Show or hide the execute button based on file type
+                    if (mode === 'javascript' || mode === 'html' || mode === 'python') {
+                        executeButton.style.display = 'inline-block'; // Show execute button
+                        saveExecuteButton.style.display = 'inline-block'; // Show save and execute button
                     } else {
-                        codeMirrorInstance = CodeMirror(codeInput, {
-                            lineNumbers: true,
-                            mode: getFileMode(file.name),
-                            value: content,
-                        });
+                        executeButton.style.display = 'none'; // Hide execute button
+                        saveExecuteButton.style.display = 'none'; // Hide save and execute button
                     }
                 };
 
@@ -318,55 +390,79 @@ function getRootNode(selector) {
 
             fileInput.click();
         }
-
-  function getFileMode(fileName) {
-    const fileExtension = fileName.split('.').pop();
-    switch (fileExtension) {
-      case 'js':
-        return 'javascript';
-      case 'html':
-        return 'htmlmixed';
-      case 'css':
-        return 'css';
-      case 'swift':
-        return 'swift';
-      case 'py':
-        return 'python';
-      case 'sh':
-      case 'bash':
-      case 'zsh':
-        return 'shell';
-      case 'm':
-      case 'mm':
-        return 'clike';
-      case 'c':
-      case 'h':
-      case 'cpp':
-      case 'hpp':
-      case 'inl':
-      case 'cc':
-      case 'cxx':
-        return 'clike';
-      case 'json':
-        return 'application/json';
-      default:
-        return 'text/plain';
-    }
-  }
-
-        function closeCodeEditor() {
-            codeEditor.style.display = 'none';
-            codeMirrorInstance.setValue('');
+        
+        function closeCodeEditorWindow() {
+            codeEditorWindow.style.display = 'none';
+            if (editor !== null) {
+                editor.setValue('');
+            }
         }
 
-   function saveFile() {
-            if (codeMirrorInstance && currentFilename) {
-                const content = codeMirrorInstance.getValue();
+        // Save a opened file
+        function saveFile() {
+            if (editor !== null && currentFilename) {
+                const content = editor.getValue();
                 const blob = new Blob([content], { type: 'text/plain' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = currentFilename; // Use the current filename
+                link.download = currentFilename;
                 link.click();
+            }
+        }
+
+        // Execute a opened file
+        function executeCode() {
+            if (editor !== null && currentFilename) {
+                const code = editor.getValue();
+                const mode = getFileMode(currentFilename);
+
+                if (mode === 'javascript') {
+                    runJavaScriptCode(code);
+                } else if (mode === 'html') {
+                    runHTMLCode(code);
+                } else if (mode === 'python') {
+                    runPythonCode(code);
+                }
+            }
+        }
+
+        // Save and execute a opened file
+        function saveAndExecuteCode() {
+            saveFile();
+            executeCode();
+        }
+
+        function getFileMode(fileName) {
+            const fileExtension = fileName.split('.').pop();
+            switch (fileExtension) {
+                case 'js':
+                    return 'javascript';
+                case 'html':
+                    return 'html';
+                case 'css':
+                    return 'css';
+                case 'swift':
+                    return 'swift';
+                case 'py':
+                    return 'python';
+                case 'sh':
+                case 'bash':
+                case 'zsh':
+                    return 'sh';
+                case 'm':
+                case 'mm':
+                case 'c':
+                case 'h':
+                case 'cpp':
+                case 'hpp':
+                case 'inl':
+                case 'cc':
+                case 'cxx':
+                    return 'c_cpp';
+                case 'json':
+                    return 'json';
+                default:
+                    return 'text';
             }
         }
     </script>
